@@ -60,6 +60,7 @@ const IdentifiersAccordion: FC<IProps> = ({ isExpertMode, updateJob, currentJob 
       }}
     >
       <Accordion
+        data-testid="identifiers-accordion"
         expanded={expanded}
         onChange={() => setExpanded(!expanded)}
         elevation={0}
@@ -158,7 +159,12 @@ const IdentifiersAccordion: FC<IProps> = ({ isExpertMode, updateJob, currentJob 
                     );
 
                     return (
-                      <Grid size={{ xs: 12, sm: 6 }} key={item}>
+                      <Grid
+                        size={{ xs: 12, sm: 6 }}
+                        key={item}
+                        data-testid={`identifier-${ITEM_TO_ENTITY_MAP[item]}`}
+                        data-checked={isChecked}
+                      >
                         {!isExpertMode ? (
                           <Tooltip title={t('deIdentify.settings.identifiers.expertTooltip')} arrow>
                             <Box sx={{ display: 'inline-block', width: '100%' }}>{control}</Box>

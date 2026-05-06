@@ -13,6 +13,19 @@ dist-ssr
 *.local
 .env
 
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
+
+# Coverage
+/coverage/
+/coverage-unit/
+/coverage-e2e/
+/coverage-combined/
+/.nyc_output/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

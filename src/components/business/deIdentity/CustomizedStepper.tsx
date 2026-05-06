@@ -217,6 +217,7 @@ export default function CustomizedSteppers() {
 
   return (
     <Stack
+      data-testid="wizard-stepper"
       sx={{
         width: '100%',
         minHeight: '100%',
@@ -306,6 +307,7 @@ export default function CustomizedSteppers() {
                 </Button>
               ) : (
                 <Button
+                  data-testid="step-back-btn"
                   color="inherit"
                   disabled={activeStep === 0}
                   onClick={handleBack}
@@ -318,6 +320,7 @@ export default function CustomizedSteppers() {
 
               <Box sx={{ flex: '1 1 auto' }} />
               <Button
+                data-testid="step-next-btn"
                 variant="contained"
                 disabled={
                   (activeStep === 0 && !selectedFramework) ||

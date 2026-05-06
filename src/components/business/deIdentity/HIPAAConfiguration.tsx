@@ -83,9 +83,10 @@ const recommendedBadgeStyle: SxProps<Theme> = {
   fontWeight: 'fontWeightMedium',
 };
 
-const HIPAAMethods: HIPAAMethodUI[] = [
+const HIPAAMethods: (HIPAAMethodUI & { slug: string })[] = [
   {
     id: 1,
+    slug: 'safe-harbor',
     title: 'Safe Harbor',
     titleKey: 'deIdentify.settings.method.safeHarbor.title',
     descKey: 'deIdentify.settings.method.safeHarbor.description',
@@ -93,6 +94,7 @@ const HIPAAMethods: HIPAAMethodUI[] = [
   },
   {
     id: 2,
+    slug: 'expert-determination',
     title: 'Expert Determination',
     titleKey: 'deIdentify.settings.method.expertDetermination.title',
     descKey: 'deIdentify.settings.method.expertDetermination.description',
@@ -103,18 +105,21 @@ const HIPAAMethods: HIPAAMethodUI[] = [
 const thresholds = [
   {
     id: 1,
+    slug: 'conservative',
     titleKey: 'deIdentify.settings.detection.thresholds.conservative.title',
     descKey: 'deIdentify.settings.detection.thresholds.conservative.description',
     score: 0.3,
   },
   {
     id: 2,
+    slug: 'balanced',
     titleKey: 'deIdentify.settings.detection.thresholds.balanced.title',
     descKey: 'deIdentify.settings.detection.thresholds.balanced.description',
     score: 0.5,
   },
   {
     id: 3,
+    slug: 'aggressive',
     titleKey: 'deIdentify.settings.detection.thresholds.aggressive.title',
     descKey: 'deIdentify.settings.detection.thresholds.aggressive.description',
     score: 0.7,
@@ -330,7 +335,12 @@ const HIPAAConfiguration = () => {
             const isActive = config?.method === method.title;
             return (
               <Grid size={{ xs: 12, md: 6 }} key={method.id}>
-                <Box onClick={() => selectMethod(method)} sx={cardContainerStyle(isActive)}>
+                <Box
+                  data-testid={`method-${method.slug}`}
+                  data-active={isActive}
+                  onClick={() => selectMethod(method)}
+                  sx={cardContainerStyle(isActive)}
+                >
                   <Box sx={cardHeaderStyle}>
                     <Box sx={iconTitleGroupStyle}>
                       {isActive ? (
@@ -404,7 +414,11 @@ const HIPAAConfiguration = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' }, mb: 4 }}>
-            <Box sx={{ flex: 2, width: '100%' }}>
+            <Box
+              data-testid="strategy-select"
+              data-value={selectedStrategyId}
+              sx={{ flex: 2, width: '100%' }}
+            >
               <Dropdown
                 options={strategyOptions}
                 value={selectedStrategyId}
@@ -454,6 +468,9 @@ const HIPAAConfiguration = () => {
               return (
                 <Grid size={{ xs: 12, md: 6, lg: 12, xl: 4 }} key={threshold.id}>
                   <Box
+                    data-testid={`threshold-${threshold.slug}`}
+                    data-active={isActive}
+                    data-score={threshold.score}
                     onClick={() => selectThreshold(threshold.score)}
                     sx={cardContainerStyle(isActive)}
                   >

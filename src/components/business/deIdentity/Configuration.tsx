@@ -9,7 +9,7 @@ const Configuration = () => {
   const { currentJob } = useAppSelector((state) => state.jobs);
 
   return (
-    <Box sx={{ mx: '20px' }}>
+    <Box data-testid="step-configuration" sx={{ mx: '20px' }}>
       <Typography
         sx={{
           color: 'neutral.900',

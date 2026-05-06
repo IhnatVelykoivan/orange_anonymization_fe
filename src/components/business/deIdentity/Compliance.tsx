@@ -86,6 +86,8 @@ const Compliance = () => {
           return (
             <Grid size={{ xs: 12, md: 6 }} key={framework.id}>
               <Box
+                data-testid={`framework-${framework.slug}`}
+                data-active={isActive}
                 onClick={() => selectFramework(framework as unknown as IComplianceFramework)}
                 sx={{
                   border: `${isActive ? 2 : 1}px solid`,

@@ -214,7 +214,7 @@ const DataInput = ({ currentJob, localOriginalText }: DataInputContentProps) => 
 
       <Tabs active={currentTab} setActive={setCurrentTab}>
         <Tab name={t('deIdentify.input.tabs.text')} icon={<EditIcon />}>
-          <Box sx={{ width: '100%' }}>
+          <Box data-testid="text-tab" sx={{ width: '100%' }}>
             <TextField
               fullWidth
               multiline
@@ -225,6 +225,7 @@ const DataInput = ({ currentJob, localOriginalText }: DataInputContentProps) => 
               onBlur={handleBlur}
               error={!!error}
               helperText={error}
+              slotProps={{ htmlInput: { 'data-testid': 'text-input' } }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '12px',
@@ -257,6 +258,7 @@ const DataInput = ({ currentJob, localOriginalText }: DataInputContentProps) => 
 
         <Tab name={t('deIdentify.input.tabs.file')} icon={<ArrowCircleUpOutlinedIcon />}>
           <Box
+            data-testid="file-tab"
             onDragOver={(e) => e.preventDefault()}
             onDrop={onDrop}
             sx={{
@@ -359,7 +361,10 @@ const DataInput = ({ currentJob, localOriginalText }: DataInputContentProps) => 
                   </>
                 ) : (
                   <>
-                    <Box sx={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                    <Box
+                      data-testid="upload-success"
+                      sx={{ display: 'flex', gap: '16px', alignItems: 'center' }}
+                    >
                       <Typography sx={{ color: 'neutral.900', fontSize: FONT_SIZES.md }}>
                         {currentJob?.wizardState?.inputData.fileName}
                       </Typography>
@@ -402,6 +407,7 @@ const DataInput = ({ currentJob, localOriginalText }: DataInputContentProps) => 
                     ? t('deIdentify.input.upload.replace')
                     : t('deIdentify.input.upload.browse')}
                   <input
+                    data-testid="file-upload-input"
                     type="file"
                     hidden
                     accept={SUPPORTED_FILE_EXTENSIONS}
@@ -431,6 +437,7 @@ const DataInput = ({ currentJob, localOriginalText }: DataInputContentProps) => 
                 >
                   {t('deIdentify.input.upload.replace')}
                   <input
+                    data-testid="file-upload-input"
                     type="file"
                     hidden
                     accept={SUPPORTED_FILE_EXTENSIONS}
@@ -451,7 +458,10 @@ const DataInput = ({ currentJob, localOriginalText }: DataInputContentProps) => 
             }}
           >
             {fileError ? (
-              <Typography sx={{ fontSize: FONT_SIZES.xs, color: 'error.main' }}>
+              <Typography
+                data-testid="upload-error"
+                sx={{ fontSize: FONT_SIZES.xs, color: 'error.main' }}
+              >
                 {fileError}
               </Typography>
             ) : (

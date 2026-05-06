@@ -207,7 +207,7 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
 
   if (isProcessing) {
     return (
-      <Box sx={{ textAlign: 'center', p: 10 }}>
+      <Box data-testid="review-and-run" data-state="processing" sx={{ textAlign: 'center', p: 10 }}>
         <CircularProgress sx={{ mb: 2, color: 'primary.500' }} />
         <Typography sx={{ color: 'neutral.500' }}>{t('deIdentify.results.analyzing')}</Typography>
       </Box>
@@ -282,7 +282,7 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
 
   if (isError) {
     return (
-      <Box sx={{ textAlign: 'center', p: 5 }}>
+      <Box data-testid="review-and-run" data-state="error" sx={{ textAlign: 'center', p: 5 }}>
         <Typography color="error" variant="h6">
           {t('deIdentify.results.failed')}
         </Typography>
@@ -295,7 +295,7 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
   }
 
   return (
-    <Box sx={{ mx: '20px' }}>
+    <Box data-testid="review-and-run" data-state="success" sx={{ mx: '20px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box>
           <Typography
