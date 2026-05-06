@@ -304,7 +304,11 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
 
   if (isProcessing) {
     return (
-      <Box sx={{ textAlign: 'center', p: REVIEW_AND_RUN_CONSTANTS.spacing.xl }}>
+      <Box
+        data-testid="review-and-run"
+        data-state="processing"
+        sx={{ textAlign: 'center', p: REVIEW_AND_RUN_CONSTANTS.spacing.xl }}
+      >
         <CircularProgress sx={{ mb: REVIEW_AND_RUN_CONSTANTS.spacing.sm, color: 'primary.500' }} />
         <Typography sx={{ color: 'neutral.500' }}>{t('deIdentify.results.analyzing')}</Typography>
       </Box>
@@ -393,7 +397,11 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
 
   if (isError) {
     return (
-      <Box sx={{ textAlign: 'center', p: REVIEW_AND_RUN_CONSTANTS.spacing.lg }}>
+      <Box
+        data-testid="review-and-run"
+        data-state="error"
+        sx={{ textAlign: 'center', p: REVIEW_AND_RUN_CONSTANTS.spacing.lg }}
+      >
         <Typography color="error" variant="h6">
           {t('deIdentify.results.failed')}
         </Typography>
@@ -408,7 +416,11 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
   }
 
   return (
-    <Box sx={{ mx: REVIEW_AND_RUN_CONSTANTS.spacing.md }}>
+    <Box
+      data-testid="review-and-run"
+      data-state="success"
+      sx={{ mx: REVIEW_AND_RUN_CONSTANTS.spacing.md }}
+    >
       {activeSessionBanner && (
         <Alert
           severity={activeSessionBanner === 'critical' ? 'error' : 'warning'}

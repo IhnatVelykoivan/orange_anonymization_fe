@@ -76,6 +76,7 @@ const Dropdown = ({
     return (
       <ListItemButton
         key={opt.id}
+        data-testid={`dropdown-option-${opt.id}`}
         onClick={() => handleSelect(opt.id)}
         sx={{
           py: 1.5,
@@ -131,6 +132,7 @@ const Dropdown = ({
   return (
     <Box ref={containerRef} sx={{ position: 'relative', width: '100%' }}>
       <ButtonBase
+        data-testid="dropdown-toggle"
         onClick={handleToggle}
         sx={{
           width: '100%',
