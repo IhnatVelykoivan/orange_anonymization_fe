@@ -221,12 +221,18 @@ Both are in pre-existing code paths; safe to address as part of MUI v7 modernisa
 
 **Sober read — don't oversell the unit number.**
 
-| Scope                                                 | Statements | Functions | Branches |
-| ----------------------------------------------------- | ---------- | --------- | -------- |
-| New unit specs **in isolation** (this PR only)        | 9.22%      | 7.4%      | 1.58%    |
-| Full unit suite (new + pre-existing, `test:coverage`) | 25.14%     | 11.5%     | 6.85%    |
-| Playwright E2E only — _prior wizard-only run_         | _60.13%_   | _51.8%_   | _59.71%_ |
-| Combined (merged via nyc) — _prior run_               | _61.6%_    | _54.72%_  | _47.25%_ |
+| Scope                                                        | Statements | Functions  | Branches   |
+| ------------------------------------------------------------ | ---------- | ---------- | ---------- |
+| New unit specs **in isolation** (this PR only)               | 9.22%      | 7.4%       | 1.58%      |
+| Full unit suite (new + pre-existing, `test:coverage`)        | 25.14%     | 11.5%      | 6.85%      |
+| **Combined unit+E2E** (`test:coverage:all`, **this branch**) | **47.35%** | **31.33%** | **31.76%** |
+| _Combined — prior wizard-only branch (pre-#48), for context_ | _61.6%_    | _54.72%_   | _47.25%_   |
+
+> ⚠️ Combined coverage **dropped from 61.6% → 47.35%** vs the old number — not a
+> regression in tests, but because develop #48 merged the **Dashboard / Synthetic
+> / All-Analyses** pages, which are large and almost entirely untested (no unit,
+> not visited by E2E). The denominator grew faster than coverage. That ~47% is the
+> honest current state of the whole app.
 
 What this PR's unit tests actually do:
 
@@ -243,15 +249,12 @@ What this PR's unit tests actually do:
 - New behavioural E2E covers the **Contact** and **Login (magic-link)** flows and
   the public **landing navigation** end to end (real components, not unit).
 
-The full unit suite is still **far below the ≥85% target**, and functions/branches
-(~7–11%) show that the remaining gap lives almost entirely in the page/component
-`.tsx` files (Dashboard / Synthetic / All-Analyses / De-ID widgets) — they need
-component-render tests, and several are mid-refactor (churn). Much of the
-behavioural coverage of the app lives in the **E2E suite (~60% stmts)**; re-run
-`npm run test:coverage:all` to get the refreshed combined figure for this branch.
-The E2E / combined rows are _italicised_ — they are the prior wizard-only
-measurement; re-run `npm run test:coverage:all` on this branch (now also includes
-`e2e/landing.spec.ts`) to refresh them.
+Both unit (25%) and combined (47%) are still **below the ≥85% target**. The
+remaining gap lives almost entirely in the page/component `.tsx` files — chiefly
+the **Dashboard / Synthetic / All-Analyses** pages, which have ~0 unit coverage
+and are not visited by E2E. These are mid-refactor (Ihor), so deep tests there
+were deliberately deferred to avoid churn; covering them is the single biggest
+lever left toward 85% and should follow the refactor.
 
 Roadmap of follow-up unit-coverage PRs is in Trello (cards 1–5: services /
 jobsSlice / utils+hooks / shared UI / pages) — `utils` and `jobsSlice` are now done;
