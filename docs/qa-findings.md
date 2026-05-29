@@ -219,23 +219,39 @@ Both are in pre-existing code paths; safe to address as part of MUI v7 modernisa
 
 ## Coverage snapshot at the time of this report
 
-| Source                                          | Statements | Lines     | Functions | Branches  |
-| ----------------------------------------------- | ---------- | --------- | --------- | --------- |
-| Vitest unit — original wizard branch            | 9.49%      | 9.97%     | 5.27%     | 4.03%     |
-| **Vitest unit — this branch (`test:coverage`)** | **20.77%** | **22.4%** | **7.17%** | **6.02%** |
-| Playwright E2E only — _prior wizard-only run_   | _60.13%_   | _62.59%_  | _51.8%_   | _59.71%_  |
-| Combined (merged via nyc) — _prior run_         | _61.6%_    | _64.57%_  | _54.72%_  | _47.25%_  |
+**Sober read — don't oversell the unit number.**
 
-Unit coverage **more than doubled** (9.49% → 20.77% statements) via the new
-`utils`, `jobsSlice`, `syntheticResultSlice` and root-reducer-guard suites — and
-the denominator itself grew on this branch (develop #48 added the Dashboard /
-All-Analyses / Synthetic pages). The E2E / combined rows are **italicised because
-they are from the original wizard-only measurement**; re-run `npm run test:coverage:all`
-on this branch (now also includes `e2e/landing.spec.ts`) to refresh them.
+| Scope                                                 | Statements | Functions | Branches |
+| ----------------------------------------------------- | ---------- | --------- | -------- |
+| New unit specs **in isolation** (this PR only)        | 6.34%      | 5.23%     | 0.90%    |
+| Full unit suite (new + pre-existing, `test:coverage`) | 23.2%      | 9.79%     | 6.17%    |
+| Playwright E2E only — _prior wizard-only run_         | _60.13%_   | _51.8%_   | _59.71%_ |
+| Combined (merged via nyc) — _prior run_               | _61.6%_    | _54.72%_  | _47.25%_ |
 
-STO target is **≥85%** unit. Roadmap of follow-up unit-coverage PRs is in Trello
-(cards 1–5: services / jobsSlice / utils+hooks / shared UI / pages) — `utils` and
-`jobsSlice` from that roadmap are now done.
+What this PR's unit tests actually do:
+
+- **Target files reach 100%**: `utils/index.ts`, `store/slices/jobsSlice.ts`,
+  `store/slices/syntheticResultSlice.ts`, and the whole service layer
+  (`jobsService`, `resultsService`, `syntheticService`, `syntheticDataService`,
+  `dashboardService`, `analysesService`, `auth.api`, `user.api`, `emailService`);
+  `store/store.ts` ~86%.
+- But in **isolation they add only ~6.3 pp** to global statement coverage — by
+  design they target small, stable, pure-logic modules (low churn), not the large
+  UI/page files. Most of the 23.2% full-suite number comes from the pre-existing
+  auth / api / contact / routes specs.
+
+The full unit suite is still **far below the ≥85% target**, and functions/branches
+(~6–10%) show that the remaining gap lives almost entirely in the page/component
+`.tsx` files (Dashboard / Synthetic / All-Analyses / Contact / Auth) — they need
+component-render tests, and several are mid-refactor (churn). The meaningful
+behavioural coverage of the app lives in the **E2E suite (~60% stmts)**, not unit.
+The E2E / combined rows are _italicised_ — they are the prior wizard-only
+measurement; re-run `npm run test:coverage:all` on this branch (now also includes
+`e2e/landing.spec.ts`) to refresh them.
+
+Roadmap of follow-up unit-coverage PRs is in Trello (cards 1–5: services /
+jobsSlice / utils+hooks / shared UI / pages) — `utils` and `jobsSlice` are now done;
+the bulk (components / hooks / services / pages) remains.
 
 ---
 
