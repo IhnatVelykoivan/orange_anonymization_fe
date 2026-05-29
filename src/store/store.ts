@@ -42,6 +42,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   jobs: persistReducer(persistConfig, jobsSlice),
   auth: authSlice,
+  dashboard: dashboardSlice,
   analyses: analysesSlice,
   syntheticResult: syntheticResultSlice,
 });
