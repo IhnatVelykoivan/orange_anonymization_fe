@@ -1,16 +1,89 @@
-# QA Findings — HIPAA Wizard E2E suite
+# QA Findings — Final regression pass
 
-> Branch: `test/e2e-hipaa-wizard` (local only, NOT pushed)
-> Run: `npm run test:e2e` → 14 passed + 1 known-fail (intentional reproducer)
+> Branch: `test/final-regression-coverage` (cherry-picked the wizard E2E suite
+> onto current `develop` #48)
+> Run: `npm run build` ✓ · `npm run test:run` → 47 passed ·
+> `npm run test:e2e` → 18 passed (wizard 15 + landing 3) + 1 known-fail reproducer
 > Artefacts: `playwright-report/index.html` (open with `npm run test:e2e:report`)
 > Coverage: `npm run test:coverage:all` → `coverage-combined/index.html`
 
-This document is the source of truth for what these tests _found_ — bugs that
-are real prod issues, plus places where the Trello AC describes behaviour that
+This document is the source of truth for what this regression pass _found_ — real
+prod bugs, process gaps, plus places where the Trello AC describes behaviour that
 does not exist in the current code.
 
-The fixes are deferred to the next sprint by product decision; the tests are
-left as live reproducers so the team can verify a fix once it lands.
+Bug #7 (build-breaker) is **fixed in this branch**. The De-ID wizard findings
+(#1–#6) are deferred to the next sprint by product decision; their tests are left
+as live reproducers so the team can verify a fix once it lands.
+
+---
+
+## Final regression pass — new findings
+
+### Bug #7 — [CRITICAL · FIXED in this branch] Dashboard slice dropped from the root reducer
+
+**Severity:** critical — broke `npm run build` (`tsc -b`) for everyone and crashed
+the Dashboard page at runtime (a demo-critical flow).
+
+**Where:**
+
+- [src/store/store.ts](../src/store/store.ts) — `combineReducers`
+- [src/pages/Dashboard/useDashboard.ts:22](../src/pages/Dashboard/useDashboard.ts) — `useSelector((state) => state.dashboard)`
+
+**Root cause:** PR #48 (`Feat/dashboard metrics filters recalc`) added the new
+`analyses` slice but, instead of inserting it as a new line, **replaced** the
+existing `dashboard: dashboardSlice` registration:
+
+```diff
+ const rootReducer = combineReducers({
+   jobs: persistReducer(persistConfig, jobsSlice),
+   auth: authSlice,
+-  dashboard: dashboardSlice,
++  analyses: analysesSlice,
+   syntheticResult: syntheticResultSlice,
+ });
+```
+
+`import dashboardSlice` and `useDashboard`'s `state.dashboard` selector were left
+in place, so `tsc -b` failed (TS6133 unused import + TS2339 `dashboard` missing on
+`RootState`) and `state.dashboard` was `undefined` at runtime → the page threw on
+destructuring `{ data, loading, error }`.
+
+**Why review missed it:** there is **no PR-level CI** — see Finding #8. Nothing
+runs `tsc`/`build`/`test` before merge, and #48's branch in isolation built fine.
+
+**Fix (this branch, commit `fix(dashboard): re-register dashboard slice dropped in #48`):**
+re-added `dashboard: dashboardSlice` to `combineReducers` (one line; `analyses`
+stays). `npm run build` is green again.
+
+**Regression guard:** [src/test/store/rootReducer.test.ts](../src/test/store/rootReducer.test.ts)
+asserts every selected slice (`jobs`, `auth`, `dashboard`, `analyses`,
+`syntheticResult`) is registered — this test fails on the broken #48 state and
+would have caught it.
+
+> Coordination note: Ihor is reworking the Dashboard / All-Analyses pages and has
+> a local fix too. This branch carries the fix as an isolated commit so it drops
+> cleanly on rebase if his lands in `develop` first.
+
+### Finding #8 — [SYSTEMIC] No PR-level CI gate (build / lint / test)
+
+[.github/workflows/deploy.yml](../.github/workflows/deploy.yml) only deploys on
+push to `develop`; `npm run build` runs **inside** the Docker image
+([Dockerfile:18](../Dockerfile)) at deploy time. No workflow runs `tsc -b` /
+`eslint` / `vitest` / `playwright` on pull requests, so a broken build (Bug #7)
+can be merged with no automated signal — it only surfaces when the develop deploy
+fails.
+
+**Suggested fix:** add a `pull_request` workflow running `npm ci` →
+`npm run lint` → `npm run build` → `npm run test:run` (optionally
+`npm run test:e2e`). Single highest-leverage process fix from this regression pass.
+
+### Finding #9 — Landing assistant widget not implemented
+
+Final-sprint scope mentions "landing page / assistant widget **if already
+implemented**". As of `develop` #48 there is no assistant/chat/widget code
+(`git grep -i 'assistant\|widget\|chat'` → nothing in `src/`). The landing page
+itself is now covered by [e2e/landing.spec.ts](../e2e/landing.spec.ts) (renders +
+public navigation to Contact / Login). No assistant test added — nothing to test yet.
 
 ---
 
@@ -146,17 +219,23 @@ Both are in pre-existing code paths; safe to address as part of MUI v7 modernisa
 
 ## Coverage snapshot at the time of this report
 
-After the suite runs (`npm run test:coverage:all`):
+| Source                                          | Statements | Lines     | Functions | Branches  |
+| ----------------------------------------------- | ---------- | --------- | --------- | --------- |
+| Vitest unit — original wizard branch            | 9.49%      | 9.97%     | 5.27%     | 4.03%     |
+| **Vitest unit — this branch (`test:coverage`)** | **20.77%** | **22.4%** | **7.17%** | **6.02%** |
+| Playwright E2E only — _prior wizard-only run_   | _60.13%_   | _62.59%_  | _51.8%_   | _59.71%_  |
+| Combined (merged via nyc) — _prior run_         | _61.6%_    | _64.57%_  | _54.72%_  | _47.25%_  |
 
-| Source                                        | Statements | Lines      | Functions  | Branches   |
-| --------------------------------------------- | ---------- | ---------- | ---------- | ---------- |
-| Vitest unit only (uninstrumented)             | 9.49%      | 9.97%      | 5.27%      | 4.03%      |
-| Playwright E2E only (instrumented dev bundle) | 60.13%     | 62.59%     | 51.8%      | 59.71%     |
-| **Combined (merged via nyc)**                 | **61.6%**  | **64.57%** | **54.72%** | **47.25%** |
+Unit coverage **more than doubled** (9.49% → 20.77% statements) via the new
+`utils`, `jobsSlice`, `syntheticResultSlice` and root-reducer-guard suites — and
+the denominator itself grew on this branch (develop #48 added the Dashboard /
+All-Analyses / Synthetic pages). The E2E / combined rows are **italicised because
+they are from the original wizard-only measurement**; re-run `npm run test:coverage:all`
+on this branch (now also includes `e2e/landing.spec.ts`) to refresh them.
 
-STO target is **≥85%** unit. Gap is ~20 p.p. on statements/lines, ~30 p.p. on
-functions/branches. Roadmap of follow-up unit-coverage PRs is in Trello (cards
-1–5: services / jobsSlice / utils+hooks / shared UI / pages).
+STO target is **≥85%** unit. Roadmap of follow-up unit-coverage PRs is in Trello
+(cards 1–5: services / jobsSlice / utils+hooks / shared UI / pages) — `utils` and
+`jobsSlice` from that roadmap are now done.
 
 ---
 
