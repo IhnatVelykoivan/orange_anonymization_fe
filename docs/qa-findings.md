@@ -2,8 +2,8 @@
 
 > Branch: `test/final-regression-coverage` (cherry-picked the wizard E2E suite
 > onto current `develop` #48)
-> Run: `npm run build` ✓ · `npm run test:run` → 47 passed ·
-> `npm run test:e2e` → 18 passed (wizard 15 + landing 3) + 1 known-fail reproducer
+> Run: `npm run build` ✓ · `npm run test:run` → 85 passed ·
+> `npm run test:e2e` → 22 passed (wizard 15 + landing 3 + contact 2 + login 2) + 1 known-fail reproducer
 > Artefacts: `playwright-report/index.html` (open with `npm run test:e2e:report`)
 > Coverage: `npm run test:coverage:all` → `coverage-combined/index.html`
 
@@ -223,28 +223,32 @@ Both are in pre-existing code paths; safe to address as part of MUI v7 modernisa
 
 | Scope                                                 | Statements | Functions | Branches |
 | ----------------------------------------------------- | ---------- | --------- | -------- |
-| New unit specs **in isolation** (this PR only)        | 6.34%      | 5.23%     | 0.90%    |
-| Full unit suite (new + pre-existing, `test:coverage`) | 23.2%      | 9.79%     | 6.17%    |
+| New unit specs **in isolation** (this PR only)        | 9.22%      | 7.4%      | 1.58%    |
+| Full unit suite (new + pre-existing, `test:coverage`) | 25.14%     | 11.5%     | 6.85%    |
 | Playwright E2E only — _prior wizard-only run_         | _60.13%_   | _51.8%_   | _59.71%_ |
 | Combined (merged via nyc) — _prior run_               | _61.6%_    | _54.72%_  | _47.25%_ |
 
 What this PR's unit tests actually do:
 
-- **Target files reach 100%**: `utils/index.ts`, `store/slices/jobsSlice.ts`,
-  `store/slices/syntheticResultSlice.ts`, and the whole service layer
-  (`jobsService`, `resultsService`, `syntheticService`, `syntheticDataService`,
-  `dashboardService`, `analysesService`, `auth.api`, `user.api`, `emailService`);
+- **Target files reach ~100%**: `utils/index.ts`, `store/slices/jobsSlice.ts`,
+  `store/slices/syntheticResultSlice.ts`, the whole service layer (`jobsService`,
+  `resultsService`, `syntheticService`, `syntheticDataService`, `dashboardService`,
+  `analysesService`, `auth.api`, `user.api`, `emailService`), and the hooks
+  `useAuthForm`, `useLanding`, `useSidebar`, `useHeader`, `useMainLayout`;
   `store/store.ts` ~86%.
-- But in **isolation they add only ~6.3 pp** to global statement coverage — by
+- But in **isolation they add only ~9 pp** to global statement coverage — by
   design they target small, stable, pure-logic modules (low churn), not the large
-  UI/page files. Most of the 23.2% full-suite number comes from the pre-existing
+  UI/page files. A chunk of the 25.14% full-suite number is the pre-existing
   auth / api / contact / routes specs.
+- New behavioural E2E covers the **Contact** and **Login (magic-link)** flows and
+  the public **landing navigation** end to end (real components, not unit).
 
 The full unit suite is still **far below the ≥85% target**, and functions/branches
-(~6–10%) show that the remaining gap lives almost entirely in the page/component
-`.tsx` files (Dashboard / Synthetic / All-Analyses / Contact / Auth) — they need
-component-render tests, and several are mid-refactor (churn). The meaningful
-behavioural coverage of the app lives in the **E2E suite (~60% stmts)**, not unit.
+(~7–11%) show that the remaining gap lives almost entirely in the page/component
+`.tsx` files (Dashboard / Synthetic / All-Analyses / De-ID widgets) — they need
+component-render tests, and several are mid-refactor (churn). Much of the
+behavioural coverage of the app lives in the **E2E suite (~60% stmts)**; re-run
+`npm run test:coverage:all` to get the refreshed combined figure for this branch.
 The E2E / combined rows are _italicised_ — they are the prior wizard-only
 measurement; re-run `npm run test:coverage:all` on this branch (now also includes
 `e2e/landing.spec.ts`) to refresh them.
