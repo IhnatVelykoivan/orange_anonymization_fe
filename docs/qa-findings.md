@@ -2,7 +2,7 @@
 
 > Branch: `test/final-regression-coverage` (cherry-picked the wizard E2E suite
 > onto current `develop` #48)
-> Run: `npm run build` ✓ · `npm run test:run` → 85 passed ·
+> Run: `npm run build` ✓ · `npm run test:run` → 99 passed ·
 > `npm run test:e2e` → 22 passed (wizard 15 + landing 3 + contact 2 + login 2) + 1 known-fail reproducer
 > Artefacts: `playwright-report/index.html` (open with `npm run test:e2e:report`)
 > Coverage: `npm run test:coverage:all` → `coverage-combined/index.html`
@@ -224,7 +224,7 @@ Both are in pre-existing code paths; safe to address as part of MUI v7 modernisa
 | Scope                                                        | Statements | Functions  | Branches   |
 | ------------------------------------------------------------ | ---------- | ---------- | ---------- |
 | New unit specs **in isolation** (this PR only)               | 9.22%      | 7.4%       | 1.58%      |
-| Full unit suite (new + pre-existing, `test:coverage`)        | 25.14%     | 11.5%      | 6.85%      |
+| Full unit suite (new + pre-existing, `test:coverage`)        | 26.09%     | 12.41%     | 7.38%      |
 | **Combined unit+E2E** (`test:coverage:all`, **this branch**) | **47.35%** | **31.33%** | **31.76%** |
 | _Combined — prior wizard-only branch (pre-#48), for context_ | _61.6%_    | _54.72%_   | _47.25%_   |
 
@@ -236,25 +236,26 @@ Both are in pre-existing code paths; safe to address as part of MUI v7 modernisa
 
 What this PR's unit tests actually do:
 
-- **Target files reach ~100%**: `utils/index.ts`, `store/slices/jobsSlice.ts`,
-  `store/slices/syntheticResultSlice.ts`, the whole service layer (`jobsService`,
-  `resultsService`, `syntheticService`, `syntheticDataService`, `dashboardService`,
-  `analysesService`, `auth.api`, `user.api`, `emailService`), and the hooks
-  `useAuthForm`, `useLanding`, `useSidebar`, `useHeader`, `useMainLayout`;
-  `store/store.ts` ~86%.
+- **Target files reach ~100%**: `utils/index.ts`, the slices `jobsSlice`,
+  `syntheticResultSlice`, `dashboardSlice` (100%) and `analysesSlice` (95%,
+  incl. thunk lifecycle), the whole service layer (`jobsService`, `resultsService`,
+  `syntheticService`, `syntheticDataService`, `dashboardService`, `analysesService`,
+  `auth.api`, `user.api`, `emailService`), and the hooks `useAuthForm`,
+  `useLanding`, `useSidebar`, `useHeader`, `useMainLayout`; `store/store.ts` ~86%.
 - But in **isolation they add only ~9 pp** to global statement coverage — by
   design they target small, stable, pure-logic modules (low churn), not the large
-  UI/page files. A chunk of the 25.14% full-suite number is the pre-existing
+  UI/page files. A chunk of the 26% full-suite number is the pre-existing
   auth / api / contact / routes specs.
 - New behavioural E2E covers the **Contact** and **Login (magic-link)** flows and
   the public **landing navigation** end to end (real components, not unit).
 
-Both unit (25%) and combined (47%) are still **below the ≥85% target**. The
-remaining gap lives almost entirely in the page/component `.tsx` files — chiefly
-the **Dashboard / Synthetic / All-Analyses** pages, which have ~0 unit coverage
-and are not visited by E2E. These are mid-refactor (Ihor), so deep tests there
-were deliberately deferred to avoid churn; covering them is the single biggest
-lever left toward 85% and should follow the refactor.
+Both unit (26%) and combined (47%) are still **below the ≥85% target**. The
+remaining gap is now the **page UI**, not the data layer: the Dashboard data
+slices/services are covered, but the **Dashboard / Synthetic / All-Analyses page
+components** (the `useDashboard` hook, charts, widgets, filters, tables) have ~0
+coverage and are not visited by E2E. These pages are mid-refactor (Ihor), so their
+component-render tests were deliberately deferred to avoid churn; covering them is
+the single biggest lever left toward 85% and should follow the refactor.
 
 Roadmap of follow-up unit-coverage PRs is in Trello (cards 1–5: services /
 jobsSlice / utils+hooks / shared UI / pages) — `utils` and `jobsSlice` are now done;
