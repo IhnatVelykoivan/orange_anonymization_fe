@@ -2,7 +2,7 @@
 
 > Branch: `test/final-regression-coverage` (cherry-picked the wizard E2E suite
 > onto current `develop` #48)
-> Run: `npm run build` ✓ · `npm run test:run` → 99 passed ·
+> Run: `npm run build` ✓ · `npm run test:run` → 150 passed ·
 > `npm run test:e2e` → 22 passed (wizard 15 + landing 3 + contact 2 + login 2)
 > Artefacts: `playwright-report/index.html` (open with `npm run test:e2e:report`)
 > Coverage: `npm run test:coverage:all` → `coverage-combined/index.html`
@@ -227,43 +227,46 @@ Both are in pre-existing code paths; safe to address as part of MUI v7 modernisa
 
 ## Coverage snapshot at the time of this report
 
-**Sober read — don't oversell the unit number.**
+| Scope                                                | Statements | Functions  | Branches   |
+| ---------------------------------------------------- | ---------- | ---------- | ---------- |
+| Unit suite — start of regression (pre-existing only) | ~25%       | ~7%        | ~6%        |
+| **Unit suite — now** (`test:coverage`, 150 tests)    | **66.94%** | **59.62%** | **43.83%** |
+| Combined unit+E2E (`test:coverage:all`)              | 63.19%     | 54.95%     | 43.01%     |
 
-| Scope                                                        | Statements | Functions  | Branches   |
-| ------------------------------------------------------------ | ---------- | ---------- | ---------- |
-| New unit specs **in isolation** (this PR only)               | 9.22%      | 7.4%       | 1.58%      |
-| Full unit suite (new + pre-existing, `test:coverage`)        | 26.09%     | 12.41%     | 7.38%      |
-| **Combined unit+E2E** (`test:coverage:all`, **this branch**) | **47.35%** | **31.33%** | **31.76%** |
-| _Combined — prior wizard-only branch (pre-#48), for context_ | _61.6%_    | _54.72%_   | _47.25%_   |
+> Note: combined (63%) reads slightly below unit-only (67%) — a measurement
+> artifact, not a regression: `test:coverage` counts every source file
+> (`coverage.all`, denominator ~2717) while the E2E run instruments only the dev
+> bundle it loads, so the nyc merge uses a different file set/denominator (~2777).
+> Treat **~67% unit** as the headline against the ≥85% target.
 
-> ⚠️ Combined coverage **dropped from 61.6% → 47.35%** vs the old number — not a
-> regression in tests, but because develop #48 merged the **Dashboard / Synthetic
-> / All-Analyses** pages, which are large and almost entirely untested (no unit,
-> not visited by E2E). The denominator grew faster than coverage. That ~47% is the
-> honest current state of the whole app.
+Coverage journey this regression pass: unit **~25% → 66.94%** statements (functions
+~7% → 60%, branches ~6% → 44%); after Ihor's Dashboard/All-Analyses refactor landed
+(develop #50/#52/#53, merged in) those pages became stable enough to test.
 
-What this PR's unit tests actually do:
+**Now covered (unit):**
 
-- **Target files reach ~100%**: `utils/index.ts`, the slices `jobsSlice`,
-  `syntheticResultSlice`, `dashboardSlice` (100%) and `analysesSlice` (95%,
-  incl. thunk lifecycle), the whole service layer (`jobsService`, `resultsService`,
-  `syntheticService`, `syntheticDataService`, `dashboardService`, `analysesService`,
-  `auth.api`, `user.api`, `emailService`), and the hooks `useAuthForm`,
-  `useLanding`, `useSidebar`, `useHeader`, `useMainLayout`; `store/store.ts` ~86%.
-- But in **isolation they add only ~9 pp** to global statement coverage — by
-  design they target small, stable, pure-logic modules (low churn), not the large
-  UI/page files. A chunk of the 26% full-suite number is the pre-existing
-  auth / api / contact / routes specs.
-- New behavioural E2E covers the **Contact** and **Login (magic-link)** flows and
-  the public **landing navigation** end to end (real components, not unit).
+- utils + all Redux slices (`jobs`, `auth`, `dashboard` 100%, `analyses` 95%,
+  `syntheticResult`) incl. thunk lifecycle; full service layer (100%); hooks
+  (`useDashboard`, `useAnalyses`-flow, `useAuthForm`, `useLanding`, `useSidebar`,
+  `useHeader`, `useMainLayout`).
+- Page renders: **Dashboard** (content + empty), **Analyses**, **SyntheticData**,
+  **SyntheticResults**, **Landing**, **Auth**, **Contact**.
+- De-ID step components rendered standalone (Compliance, Configuration,
+  HIPAAConfiguration, DataInput, IdentifiersAccordion) + **ReviewAndRun**
+  (success + processing); layout components (Header, Sidebar, Auth/Landing/Main).
 
-Both unit (26%) and combined (47%) are still **below the ≥85% target**. The
-remaining gap is now the **page UI**, not the data layer: the Dashboard data
-slices/services are covered, but the **Dashboard / Synthetic / All-Analyses page
-components** (the `useDashboard` hook, charts, widgets, filters, tables) have ~0
-coverage and are not visited by E2E. These pages are mid-refactor (Ihor), so their
-component-render tests were deliberately deferred to avoid churn; covering them is
-the single biggest lever left toward 85% and should follow the refactor.
+**What still blocks ≥85% (honest):**
+
+- **`CustomizedStepper`** (the wizard host) + `StepContent` — its mount effect chain
+  (`getLatestDraft → createJob → dispatch`) plus polling keeps a jsdom unit render
+  from settling (it hangs the run), so it's left to the **E2E** suite which already
+  drives it end to end. ~0 unit there.
+- App bootstrap (`App.tsx`, `i18n.ts`, `main.tsx`) — low-value to unit-test.
+- Remaining interaction branches: ReviewAndRun entity-toggle/tabs/export, several
+  popups/drawers, DateRangeFilter calendar. These are incremental (~1–2 pp each).
+
+Reaching 85% from here is mostly grinding those interaction branches; the big
+structural gains (pages, slices, services, step components, layouts) are done.
 
 Roadmap of follow-up unit-coverage PRs is in Trello (cards 1–5: services /
 jobsSlice / utils+hooks / shared UI / pages) — `utils` and `jobsSlice` are now done;
