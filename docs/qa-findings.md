@@ -2,7 +2,7 @@
 
 > Branch: `test/final-regression-coverage` (cherry-picked the wizard E2E suite
 > onto current `develop` #48)
-> Run: `npm run build` ✓ · `npm run test:run` → 150 passed ·
+> Run: `npm run build` ✓ · `npm run test:run` → 155 passed ·
 > `npm run test:e2e` → 22 passed (wizard 15 + landing 3 + contact 2 + login 2)
 > Artefacts: `playwright-report/index.html` (open with `npm run test:e2e:report`)
 > Coverage: `npm run test:coverage:all` → `coverage-combined/index.html`
@@ -230,17 +230,17 @@ Both are in pre-existing code paths; safe to address as part of MUI v7 modernisa
 | Scope                                                | Statements | Functions  | Branches   |
 | ---------------------------------------------------- | ---------- | ---------- | ---------- |
 | Unit suite — start of regression (pre-existing only) | ~25%       | ~7%        | ~6%        |
-| **Unit suite — now** (`test:coverage`, 150 tests)    | **66.94%** | **59.62%** | **43.83%** |
-| Combined unit+E2E (`test:coverage:all`)              | 63.19%     | 54.95%     | 43.01%     |
+| **Unit suite — now** (`test:coverage`, 155 tests)    | **69.89%** | **62.94%** | **47.42%** |
+| Combined unit+E2E (`test:coverage:all`)              | ~63%       | ~55%       | ~43%       |
 
-> Note: combined (63%) reads slightly below unit-only (67%) — a measurement
-> artifact, not a regression: `test:coverage` counts every source file
-> (`coverage.all`, denominator ~2717) while the E2E run instruments only the dev
-> bundle it loads, so the nyc merge uses a different file set/denominator (~2777).
-> Treat **~67% unit** as the headline against the ≥85% target.
+> Note: combined reads slightly below unit-only — a measurement artifact, not a
+> regression: `test:coverage` counts every source file (`coverage.all`, denominator
+> ~2717) while the E2E run instruments only the dev bundle it loads, so the nyc
+> merge uses a different file set/denominator. Treat **~70% unit** as the headline
+> against the ≥85% target. (Combined figure predates the last few unit additions.)
 
-Coverage journey this regression pass: unit **~25% → 66.94%** statements (functions
-~7% → 60%, branches ~6% → 44%); after Ihor's Dashboard/All-Analyses refactor landed
+Coverage journey this regression pass: unit **~25% → 69.89%** statements (functions
+~7% → 63%, branches ~6% → 47%); after Ihor's Dashboard/All-Analyses refactor landed
 (develop #50/#52/#53, merged in) those pages became stable enough to test.
 
 **Now covered (unit):**

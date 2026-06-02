@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import ReviewAndRun from '@/components/business/deIdentity/ReviewAndRun';
@@ -85,5 +85,24 @@ describe('ReviewAndRun', () => {
     const view = await screen.findByTestId('review-and-run');
     expect(view.getAttribute('data-state')).toBe('processing');
     expect(resultsService.getResults).not.toHaveBeenCalled();
+  });
+
+  it('supports switching tabs and copying the anonymized text', async () => {
+    Object.assign(navigator, { clipboard: { writeText: vi.fn() } });
+    vi.mocked(jobsService.getJobById).mockResolvedValue(job);
+    vi.mocked(resultsService.getResults).mockResolvedValue(results);
+
+    renderWithProviders(
+      <MemoryRouter>
+        <ReviewAndRun jobId={JOB_ID} />
+      </MemoryRouter>,
+    );
+
+    await screen.findByTestId('review-and-run');
+
+    fireEvent.click(screen.getByRole('tab', { name: 'deIdentify.results.deIdentifiedTab' }));
+    fireEvent.click(screen.getByRole('button', { name: 'common.copy' }));
+
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('[REDACTED] content');
   });
 });
