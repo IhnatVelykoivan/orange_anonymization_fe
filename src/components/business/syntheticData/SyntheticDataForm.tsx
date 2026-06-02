@@ -119,6 +119,7 @@ export default function SyntheticDataForm({ sourceJobId }: SyntheticDataFormProp
                     value={framework}
                     onChange={(e) => setFramework(String(e.target.value))}
                     sx={(theme) => ({
+                      height: 60,
                       backgroundColor: theme.palette.background.default,
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderColor: theme.palette.divider,
@@ -150,6 +151,7 @@ export default function SyntheticDataForm({ sourceJobId }: SyntheticDataFormProp
                     value={outputFormat}
                     onChange={(e) => setOutputFormat(e.target.value as SyntheticOutputFormat)}
                     sx={(theme) => ({
+                      height: 60,
                       backgroundColor: theme.palette.background.default,
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderColor: theme.palette.divider,

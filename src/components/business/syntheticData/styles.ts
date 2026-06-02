@@ -80,7 +80,11 @@ export const synthetic = {
     '& .MuiOutlinedInput-root': { backgroundColor: theme.palette.background.default },
   }),
 
-  twoColumnRow: (theme: Theme) => ({ display: 'flex', gap: theme.spacing(layout.gap) }),
+  twoColumnRow: (theme: Theme) => ({
+    display: 'flex',
+    gap: theme.spacing(layout.gap),
+    alignItems: 'flex-end',
+  }),
 
   previewSection: (theme: Theme) => ({
     padding: theme.spacing(2),

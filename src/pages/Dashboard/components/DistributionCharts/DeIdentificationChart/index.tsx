@@ -1,15 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  ResponsiveContainer,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Bar,
-  ReferenceLine,
-} from 'recharts';
+import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 
 import { useTheme } from '@mui/material';
 
@@ -21,23 +13,19 @@ interface Props {
   data: DistributionData[];
 }
 
-const CHART_HEIGHT = 320;
+const CHART_HEIGHT = 323;
 const BAR_SIZE = 16;
 const BAR_GAP = 24;
-const MAX_DOMAIN = 250;
-const GRID_STROKE_WIDTH = 1;
 const GRID_DASH_ARRAY = '3 3';
 const BAR_RADIUS: [number, number, number, number] = [0, 4, 4, 0];
 const Y_AXIS_WIDTH = 110;
 
 const CHART_MARGIN = {
-  top: 20,
+  top: 0,
   right: 0,
   left: -20,
   bottom: 0,
 };
-
-const TICKS = [0, 50, 100, 150, 200, 250];
 
 const ALL_STRATEGIES = [
   'Redact',
@@ -80,6 +68,17 @@ export const DeIdentificationChart: React.FC<Props> = ({ data }) => {
     };
   });
 
+  const domainMax = useMemo(() => {
+    const max = Math.max(...normalizedData.map((d) => d.count), 0);
+    const rounded = Math.ceil(max / 50) * 50;
+    return Math.max(rounded, 50);
+  }, [normalizedData]);
+
+  const ticks = useMemo(() => {
+    const step = domainMax / 5;
+    return Array.from({ length: 6 }, (_, i) => Math.round(i * step));
+  }, [domainMax]);
+
   return (
     <ChartWrapper>
       <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
@@ -98,18 +97,11 @@ export const DeIdentificationChart: React.FC<Props> = ({ data }) => {
             }
           />
 
-          <ReferenceLine
-            x={MAX_DOMAIN}
-            stroke={theme.palette.charts.grid}
-            strokeWidth={GRID_STROKE_WIDTH}
-            strokeDasharray={GRID_DASH_ARRAY}
-          />
-
           <XAxis
             type="number"
             orientation="top"
-            domain={[0, MAX_DOMAIN]}
-            ticks={TICKS}
+            domain={[0, domainMax]}
+            ticks={ticks}
             tickLine={false}
             axisLine={{
               stroke: theme.palette.charts.grid,

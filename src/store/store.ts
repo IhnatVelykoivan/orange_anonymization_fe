@@ -16,7 +16,6 @@ import authSlice from './auth/auth.slice';
 import dashboardSlice from './slices/dashboardSlice';
 import analysesSlice from './slices/analysesSlice';
 import syntheticResultSlice from './slices/syntheticResultSlice';
-
 import { AUTH_THUNK_TYPES } from './auth/auth.constants';
 
 const customSessionStorage = {

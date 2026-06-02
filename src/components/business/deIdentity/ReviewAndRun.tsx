@@ -188,6 +188,7 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
 
   const filteredEntities =
     detectedEntities.filter((entity) => {
+      if (!entity || !entity.entity_type) return false;
       if (selectedEntityTypes.length === 0) return true;
       return selectedEntityTypes.includes(entity.entity_type);
     }) || [];
@@ -195,14 +196,14 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
   const sortedEntities = [...filteredEntities].sort((a, b) => {
     switch (selectedOptionId) {
       case 'confidence_asc':
-        return b.score - a.score;
+        return (b?.score ?? 0) - (a?.score ?? 0);
 
       case 'position_asc':
-        return a.entity_type.localeCompare(b.entity_type);
+        return (a?.entity_type ?? '').localeCompare(b?.entity_type ?? '');
 
       case 'confidence_desc':
       default:
-        return a.start - b.start;
+        return (a?.start ?? 0) - (b?.start ?? 0);
     }
   });
 
@@ -245,19 +246,23 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
         await getResults();
         dispatch(setJobAC(job));
       } else if (job.status === JobStatus.FAILED) {
+        stopPolling();
+        setIsProcessing(false);
+        setHasFailedGeneration(true);
+
         try {
           const partial = await resultsService.getResults(jobId);
-          setResults(partial);
-        } catch {
-          // Silent catch
+          if (partial) {
+            setResults(partial);
+          }
+        } catch (e) {
+          console.warn('Failed to load partial results for failed job', e);
         }
-
-        setHasFailedGeneration(true);
-        setIsProcessing(false);
-        stopPolling();
       }
     } catch (err) {
       console.error('ReviewAndRun.checkStatus failed for jobId:', jobId, err);
+      stopPolling();
+      setIsProcessing(false);
       handleError('errors.network');
     }
   }, [dispatch, getResults, handleError, jobId]);
@@ -359,6 +364,15 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
 
   const renderHighlightedText = (text: string, entities: EntityDetection[]) => {
     if (!entities.length) return text;
+    if (!text) {
+      return (
+        <Typography
+          sx={{ color: 'neutral.400', textAlign: 'center', fontWeight: 'fontWeightSemiBold' }}
+        >
+          {t('deIdentify.results.noTextAvailable')}
+        </Typography>
+      );
+    }
 
     const sortedEntities = [...entities].sort((a, b) => a.start - b.start);
 
@@ -936,7 +950,7 @@ const ReviewAndRun: FC<IProps> = ({ jobId }) => {
 
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                           <Typography sx={{ fontSize: FONT_SIZES.sm, color: 'neutral.700' }} noWrap>
-                            {localOriginalText.slice(entity.start, entity.end)}
+                            {localOriginalText && localOriginalText.slice(entity.start, entity.end)}
                           </Typography>
                           <Typography
                             sx={{

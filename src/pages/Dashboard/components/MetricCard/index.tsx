@@ -17,13 +17,17 @@ interface MetricCardProps {
 }
 
 export const MetricCard: React.FC<MetricCardProps> = ({ icon, label, value, state }) => {
+  const hasData = typeof value === 'number' ? value > 0 : parseFloat(String(value)) > 0;
+
   const renderValue = () => {
     if (state === 'loading') {
-      return <Skeleton width={SKELETON_WIDTH} height={SKELETON_HEIGHT} />;
+      return (
+        <Skeleton width={SKELETON_WIDTH} height={SKELETON_HEIGHT} sx={{ bgcolor: 'primary.300' }} />
+      );
     }
 
     if (state === 'error') {
-      return <Value>—</Value>;
+      return <Value isError>—</Value>;
     }
 
     return <Value>{value}</Value>;
@@ -32,7 +36,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({ icon, label, value, stat
   return (
     <CardWrapper>
       <TopBar />
-      <IconWrapper>{icon}</IconWrapper>
+
+      <IconWrapper hasData={hasData}>{icon}</IconWrapper>
 
       <Box>
         <Label>{label}</Label>

@@ -193,7 +193,7 @@ const Dashboard: React.FC = () => {
         </ChartHeaderRow>
 
         <RecentActivityTableWrapper>
-          <RecentActivityTable rows={recentActivity.slice(0, 5)} />
+          <RecentActivityTable rows={recentActivity} state={state} />
         </RecentActivityTableWrapper>
       </RecentActivityCard>
     </PageWrapper>

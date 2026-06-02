@@ -4,9 +4,6 @@ import { styled } from '@mui/material/styles';
 import { BORDERS } from '@/theme';
 
 const ANALYSES_CARD_MARGIN_TOP = 24;
-const ANALYSES_CARD_MIN_HEIGHT = 320;
-const LOADING_OVERLAY_BG = 'rgba(255, 255, 255, 0.6)';
-const LOADING_OVERLAY_BLUR = 'blur(2px)';
 
 export const PageWrapper = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.neutral[50],
@@ -22,13 +19,6 @@ export const AnalysesCard = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
 }));
 
-export const AnalysesCardCenteredContent = styled(AnalysesCard)({
-  minHeight: ANALYSES_CARD_MIN_HEIGHT,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-});
-
 export const TableContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'loading',
 })<{ loading?: boolean }>(({ theme, loading }) => ({
@@ -38,17 +28,6 @@ export const TableContainer = styled(Box, {
   transition: theme.transitions.create('opacity', {
     duration: theme.transitions.duration.short,
   }),
-}));
-
-export const LoadingOverlay = styled(Box)(({ theme }) => ({
-  position: 'absolute',
-  inset: 0,
-  zIndex: theme.zIndex.modal,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: LOADING_OVERLAY_BG,
-  backdropFilter: LOADING_OVERLAY_BLUR,
 }));
 
 export const AnalysesFooter = styled(Box)(({ theme }) => ({

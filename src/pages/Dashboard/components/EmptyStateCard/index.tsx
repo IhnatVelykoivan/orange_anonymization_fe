@@ -4,7 +4,15 @@ import { CircularProgress } from '@mui/material';
 
 import type { DashboardState } from '@/pages/Dashboard/types';
 
-import { CardWrapper, Title, Subtitle, EmptyBody, EmptyLabel, SectionDivider } from './styled';
+import {
+  CardWrapper,
+  Title,
+  Subtitle,
+  EmptyBody,
+  EmptyLabel,
+  SectionDivider,
+  ErrorLabel,
+} from './styled';
 
 interface EmptyStateCardProps {
   state: DashboardState;
@@ -48,7 +56,7 @@ export const EmptyStateCard: React.FC<EmptyStateCardProps> = ({
 
       {state === 'error' && (
         <EmptyBody>
-          <EmptyLabel>{t('dashboard.errors.failedToLoadAnalysesActivity')}</EmptyLabel>
+          <ErrorLabel>{t('dashboard.errors.failedToLoadAnalysesActivity')}</ErrorLabel>
         </EmptyBody>
       )}
 

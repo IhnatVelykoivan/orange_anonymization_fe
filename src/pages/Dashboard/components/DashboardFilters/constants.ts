@@ -11,11 +11,11 @@ export const FRAMEWORK_OPTIONS = [
   },
   {
     value: FRAMEWORK_VALUES.GDPR,
-    translationKey: 'dashboard.filters.gdpr',
+    translationKey: 'dashboard.filters.euGdpr',
   },
   {
     value: FRAMEWORK_VALUES.UK_DPI,
-    translationKey: 'dashboard.filters.ukDpi',
+    translationKey: 'dashboard.filters.ukGdpr',
   },
   {
     value: FRAMEWORK_VALUES.FADP,

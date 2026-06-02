@@ -13,7 +13,6 @@ import CheckIcon from '@mui/icons-material/Check';
 
 import { BORDERS } from '@/theme';
 
-const DATE_FILTER_BUTTON = 180;
 const SEARCH_INPUT_HEIGHT = 36;
 const DATE_POPOVER_WIDTH = 680;
 
@@ -42,7 +41,6 @@ export const DateFilterButton = styled(Button, {
 })<{ open?: boolean }>(({ theme, open }) => ({
   ...theme.typography.bodyMd,
   height: SEARCH_INPUT_HEIGHT,
-  minWidth: DATE_FILTER_BUTTON,
   border: `${BORDERS.card}px solid ${open ? theme.palette.primary[500] : theme.palette.neutral[200]}`,
   textTransform: 'none',
   borderRadius: theme.shape.sm,
@@ -52,6 +50,13 @@ export const DateFilterButton = styled(Button, {
   color: theme.palette.neutral[700],
   whiteSpace: 'nowrap',
   padding: theme.spacing(0.75, 1.5),
+  flex: 1,
+  minWidth: 140,
+
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    minWidth: 'unset',
+  },
 
   ...(open && {
     boxShadow: `0 0 0 1px ${theme.palette.primary[500]}`,

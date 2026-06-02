@@ -43,6 +43,9 @@ interface ActivityChartProps {
 interface DotProps {
   cx?: number;
   cy?: number;
+  payload?: {
+    date: string;
+  };
 }
 
 export const ActivityChart: React.FC<ActivityChartProps> = ({
@@ -56,7 +59,9 @@ export const ActivityChart: React.FC<ActivityChartProps> = ({
   const theme = useTheme();
   const isDocuments = chartType === CHART_TYPES.DOCUMENTS;
   const strokeColor = isDocuments ? theme.palette.primary[500] : theme.palette.accent[400];
-  const dataKey = isDocuments ? CHART_TYPES.DOCUMENTS : CHART_TYPES.ENTITIES;
+  const dataKey: 'documents' | 'entities' = isDocuments
+    ? CHART_TYPES.DOCUMENTS
+    : CHART_TYPES.ENTITIES;
 
   const dataMap = useMemo(() => {
     const map = new Map<string, ChartData>();
@@ -86,12 +91,27 @@ export const ActivityChart: React.FC<ActivityChartProps> = ({
     });
   }, [dataMap, startDate, endDate]);
 
-  const xAxisTicks = useMemo(() => {
-    const total = normalizedData.length;
-    const step = total <= 7 ? 1 : total <= 14 ? 2 : total <= 30 ? 4 : 7;
+  const firstDataIndex = useMemo(() => {
+    return normalizedData.findIndex((item) => (item[dataKey] ?? 0) > 0);
+  }, [normalizedData, dataKey]);
 
-    return normalizedData.filter((_, i) => i % step === 0).map((d) => d.date);
-  }, [normalizedData]);
+  const visibleChartData = useMemo(() => {
+    if (firstDataIndex === -1) {
+      return normalizedData;
+    }
+
+    const leftPadding = 2;
+    const startIndex = Math.max(firstDataIndex - leftPadding, 0);
+
+    return normalizedData.slice(startIndex);
+  }, [normalizedData, firstDataIndex]);
+
+  const xAxisTicks = useMemo(() => {
+    const total = visibleChartData.length;
+    const step = total <= 14 ? 1 : total <= 30 ? 2 : total <= 90 ? 4 : 7;
+
+    return visibleChartData.filter((_, i) => i % step === 0).map((d) => d.date);
+  }, [visibleChartData]);
 
   const isEmptyChart = useMemo(() => {
     return normalizedData.every((i) => (i[dataKey] ?? 0) === 0);
@@ -108,10 +128,39 @@ export const ActivityChart: React.FC<ActivityChartProps> = ({
     );
   }, [maxValue]);
 
+  const visibleTicksSet = useMemo(() => new Set(xAxisTicks), [xAxisTicks]);
+
   const renderChartDot =
     (innerRadius: number, opacity: number) =>
-    ({ cx, cy }: DotProps) => {
-      if (cx == null || cy == null) return null;
+    (
+      props: DotProps & {
+        payload?: ChartData;
+        value?: number;
+        index?: number;
+      },
+    ) => {
+      const { cx, cy, payload, value, index } = props;
+
+      if (cx == null || cy == null || !payload || index == null) {
+        return null;
+      }
+
+      const pointValue = typeof value === 'number' ? value : Number(payload[dataKey] ?? 0);
+
+      const hasValue = pointValue > 0;
+      const isVisibleTick = visibleTicksSet.has(payload.date);
+      const previousPoint = visibleChartData[index - 1];
+      const nextPoint = visibleChartData[index + 1];
+
+      const previousValue = previousPoint ? Number(previousPoint[dataKey] ?? 0) : 0;
+      const nextValue = nextPoint ? Number(nextPoint[dataKey] ?? 0) : 0;
+
+      const isTransitionPoint =
+        (pointValue === 0 && previousValue > 0) || (pointValue === 0 && nextValue > 0);
+
+      if (!hasValue && !isVisibleTick && !isTransitionPoint) {
+        return null;
+      }
 
       return (
         <g>
@@ -137,7 +186,7 @@ export const ActivityChart: React.FC<ActivityChartProps> = ({
   if (state === 'loading') {
     return (
       <ChartLoaderWrapper>
-        <CircularProgress color="inherit" />
+        <CircularProgress />
       </ChartLoaderWrapper>
     );
   }
@@ -161,7 +210,7 @@ export const ActivityChart: React.FC<ActivityChartProps> = ({
   return (
     <ChartWrapper>
       <ResponsiveContainer width="100%" height={CHART_CONSTANTS.CHART_HEIGHT}>
-        <AreaChart data={normalizedData} margin={CHART_MARGIN}>
+        <AreaChart data={visibleChartData} margin={CHART_MARGIN}>
           <defs>
             <linearGradient id={CHART_CONSTANTS.GRADIENT.ID} x1="0" y1="0" x2="0" y2="1">
               <stop
@@ -204,7 +253,9 @@ export const ActivityChart: React.FC<ActivityChartProps> = ({
             stroke={strokeColor}
             strokeWidth={CHART_CONSTANTS.AREA_STROKE_WIDTH}
             fill={CHART_CONSTANTS.GRADIENT.FILL}
-            dot={renderChartDot(CHART_CONSTANTS.DOT.INNER_RADIUS, CHART_CONSTANTS.DOT.OPACITY)}
+            dot={(props) =>
+              renderChartDot(CHART_CONSTANTS.DOT.INNER_RADIUS, CHART_CONSTANTS.DOT.OPACITY)(props)
+            }
             activeDot={renderChartDot(
               CHART_CONSTANTS.DOT.ACTIVE_INNER_RADIUS,
               CHART_CONSTANTS.DOT.ACTIVE_OPACITY,

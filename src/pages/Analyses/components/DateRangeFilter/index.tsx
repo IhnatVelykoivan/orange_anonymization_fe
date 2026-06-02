@@ -40,6 +40,18 @@ interface DateRangeFilterProps {
   open?: boolean;
 }
 
+function endOfDay(date: Date): Date {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+
+function startOfDay(date: Date): Date {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ dateRange, setDateRange }) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -60,8 +72,8 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ dateRange, set
 
   const handleApply = () => {
     setDateRange({
-      start: startDate,
-      end: endDate,
+      start: startDate ? startOfDay(startDate) : null,
+      end: endDate ? endOfDay(endDate) : null,
     });
     setAnchorEl(null);
   };
