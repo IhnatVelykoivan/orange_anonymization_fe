@@ -857,6 +857,7 @@
       "failedToGenerate": "Something went wrong while processing the document. Please try again.",
       "tryAgain": "Try again",
       "noPreview": "No preview available",
+      "noTextAvailable": "The data has been removed due to personal safety.",
       "retry": "Retry",
       "original": "Original Text",
       "originalTab": "Original",
