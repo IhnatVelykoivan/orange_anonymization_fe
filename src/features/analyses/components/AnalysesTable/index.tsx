@@ -1,21 +1,18 @@
 import React from 'react';
-
 import { useTranslation } from 'react-i18next';
 
 import { DataTable } from '@/components/common/DataTable';
 import type { ColumnDef } from '@/components/common/DataTable/types';
-
 import { DocumentCell } from '@/features/analyses/components/DocumentCell';
 import { StatusBadge } from '@/features/analyses/components/StatusBadge';
-
 import { formatDate, formatFramework } from '@/features/analyses/utils/formatters';
-
 import type { RecentActivity } from '@/services/dashboard/types';
 
-import { BodyCell, CellContent, TableWrapper } from './styled';
+import { BodyCell, CellContent } from './styled';
 
 interface AnalysesTableProps {
   rows: RecentActivity[];
+  state?: 'loading' | 'error' | 'empty' | 'content';
 }
 
 const useColumns = (): ColumnDef<RecentActivity>[] => {
@@ -70,12 +67,17 @@ const useColumns = (): ColumnDef<RecentActivity>[] => {
   ];
 };
 
-export const AnalysesTable: React.FC<AnalysesTableProps> = ({ rows }) => {
+export const AnalysesTable: React.FC<AnalysesTableProps> = ({ rows, state }) => {
   const columns = useColumns();
+  const { t } = useTranslation();
 
   return (
-    <TableWrapper>
-      <DataTable columns={columns} rows={rows} />
-    </TableWrapper>
+    <DataTable
+      columns={columns}
+      rows={rows}
+      state={state}
+      emptyMessage={t('dashboard.recentActivity.noActivity')}
+      errorMessage={t('dashboard.recentActivity.error')}
+    />
   );
 };

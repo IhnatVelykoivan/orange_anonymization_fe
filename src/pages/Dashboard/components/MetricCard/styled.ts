@@ -26,15 +26,28 @@ export const TopBar = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.primary[500],
 }));
 
-export const IconWrapper = styled(Box)(({ theme }) => ({
+export const IconWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'hasData',
+})<{ hasData: boolean }>(({ theme, hasData }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   width: LAYOUT.icon.md,
   height: LAYOUT.icon.md,
   borderRadius: theme.radius.circle,
-  backgroundColor: theme.palette.neutral[100],
   flexShrink: 0,
+
+  backgroundColor: hasData ? theme.palette.primary[50] : theme.palette.neutral[100],
+
+  color: hasData ? theme.palette.primary[500] : theme.palette.neutral[500],
+
+  '& svg': {
+    color: 'inherit',
+  },
+
+  '& svg path': {
+    fill: 'currentColor',
+  },
 }));
 
 export const Label = styled('div')(({ theme }) => ({
@@ -43,7 +56,9 @@ export const Label = styled('div')(({ theme }) => ({
   marginBottom: theme.spacing(0.5),
 }));
 
-export const Value = styled('div')(({ theme }) => ({
+export const Value = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'isError',
+})<{ isError?: boolean }>(({ theme, isError }) => ({
   ...theme.typography.h4,
-  color: theme.palette.neutral[900],
+  color: isError ? theme.palette.error.main : theme.palette.neutral[900],
 }));

@@ -1,7 +1,7 @@
 import { CHART_CONSTANTS } from './constants';
 
 export const formatChartDate = (value: string): string => {
-  const date = new Date(value);
+  const date = new Date(value.replace(' ', 'T'));
 
   if (Number.isNaN(date.getTime())) {
     return value;

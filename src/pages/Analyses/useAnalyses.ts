@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@/store/store';
 import { fetchAnalyses } from '@/store/slices/analysesSlice';
+
+export type AnalysesState = 'loading' | 'error' | 'empty' | 'content';
 
 interface Params {
   page: number;
@@ -23,7 +25,7 @@ export const useAnalyses = ({
   endDate,
 }: Params) => {
   const dispatch = useAppDispatch();
-  const analyses = useAppSelector((state) => state.analyses);
+  const { rows, total, loading, error } = useAppSelector((state) => state.analyses);
 
   const abortRef = useRef<AbortController | null>(null);
 
@@ -45,10 +47,21 @@ export const useAnalyses = ({
       }),
     );
 
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, [dispatch, page, limit, search, framework, status, startDate, endDate]);
 
-  return analyses;
+  const state: AnalysesState = useMemo(() => {
+    if (loading) return 'loading';
+    if (error) return 'error';
+    if (!rows.length) return 'empty';
+    return 'content';
+  }, [loading, error, rows]);
+
+  return {
+    rows,
+    total,
+    loading,
+    error,
+    state,
+  };
 };

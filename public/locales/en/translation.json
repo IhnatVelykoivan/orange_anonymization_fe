@@ -311,8 +311,8 @@
     "filters": {
       "allFrameworks": "All frameworks",
       "hipaa": "HIPAA",
-      "gdpr": "EU GDPR",
-      "ukDpi": "UK GDPR",
+      "euGdpr": "EU GDPR",
+      "ukGdpr": "UK GDPR",
       "fadp": "Swiss FADP",
       "today": "Today",
       "yesterday": "Yesterday",
@@ -365,13 +365,13 @@
       "subtitle": "Last 5 analyses across all compliance frameworks",
       "viewAll": "View all",
       "noActivity": "No recent activity",
+      "error": "Failed to load recent activity",
       "columns": {
         "document": "Document",
         "status": "Status",
         "framework": "Framework",
         "entities": "Entities",
-        "date": "Date",
-        "action": "Action"
+        "date": "Date"
       },
       "status": {
         "succeeded": "Succeeded",
@@ -398,7 +398,8 @@
     },
     "errors": {
       "failedToLoadProcessingActivity": "Failed to load processing activity",
-      "failedToLoadAnalysesActivity": "Failed to load analyses activity"
+      "failedToLoadAnalysesActivity": "Failed to load analyses activity",
+      "failedToExportAnalyses": "Failed to export analyses"
     },
     "emptyState": {
       "noAnalysesFound": "No analyses found",
@@ -450,7 +451,10 @@
         "BIOMETRIC": "Bio. Data",
         "PHOTO": "Photo/Image",
         "FREE_TEXT": "Free Text PHI",
-        "URL": "URL"
+        "URL": "URL",
+        "US_DRIVER_LICENSE": "Driver license",
+        "VEHICLE": "Vehicle ID",
+        "HEALTH_PLAN": "Health plan"
       },
       "showLess": "Show less",
       "showAll": "Show all {{count}} entity types"

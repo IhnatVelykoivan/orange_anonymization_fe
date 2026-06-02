@@ -44,10 +44,11 @@ const BOTTOM_LINE_MAX_ANGLE = 320;
 const TOP_RIGHT_X_OFFSET = 8;
 const TOP_RIGHT_Y_OFFSET = 8;
 const BOTTOM_EXTRA_LINE_LENGTH = 30;
+const TEXT_GAP = 4;
 
 const PIE_CHART_MARGIN = {
-  top: 0,
-  right: 0,
+  top: 20,
+  right: 20,
   bottom: 0,
   left: 0,
 };
@@ -97,8 +98,8 @@ export const ComplianceChart: React.FC<Props> = ({ data }) => {
 
   const sortedData = useMemo(() => {
     const cloned = [...formattedData];
-    const swissIndex = cloned.findIndex((i) => i.key === 'swiss_fadp');
-    const ukIndex = cloned.findIndex((i) => i.key === 'uk_dpi');
+    const swissIndex = cloned.findIndex((i) => i.key === 'swiss-fadp');
+    const ukIndex = cloned.findIndex((i) => i.key === 'uk-gdpr');
 
     if (swissIndex !== -1 && ukIndex !== -1) {
       [cloned[swissIndex], cloned[ukIndex]] = [cloned[ukIndex], cloned[swissIndex]];
@@ -122,7 +123,7 @@ export const ComplianceChart: React.FC<Props> = ({ data }) => {
       innerRadius: outerRadius * 0.72,
       lineLength: isSingleItem ? (isMobile ? 40 : 58) : isMobile ? 26 : isTablet ? 42 : 60,
       fontSize: isMobile ? 9 : isTablet ? 11 : 13,
-      labelYOffset: isMobile ? 14 : 18,
+      lineGap: isMobile ? 12 : 16,
       percentYOffset: isMobile ? 2 : 4,
     };
   }, [containerWidth, isSingleItem, isMobile, isTablet]);
@@ -158,7 +159,6 @@ export const ComplianceChart: React.FC<Props> = ({ data }) => {
         const mx = sx + OFFSET;
         const my = sy;
         const ex = mx + chartConfig.lineLength;
-        const lineCenterX = (mx + ex) / 2;
 
         return (
           <g>
@@ -168,22 +168,20 @@ export const ComplianceChart: React.FC<Props> = ({ data }) => {
               strokeWidth={LABEL_STROKE_WIDTH}
               fill="none"
             />
-
             <text
-              x={lineCenterX}
-              y={my - chartConfig.labelYOffset}
-              textAnchor="middle"
+              x={ex}
+              y={my - chartConfig.lineGap - TEXT_GAP}
+              textAnchor="end"
               fontWeight={LABEL_FONT_WEIGHT}
               fontSize={chartConfig.fontSize}
               fill={color}
             >
               {label}
             </text>
-
             <text
-              x={lineCenterX}
+              x={ex}
               y={my - chartConfig.percentYOffset}
-              textAnchor="middle"
+              textAnchor="end"
               fontWeight={PERCENT_FONT_WEIGHT}
               fontSize={chartConfig.fontSize}
               fill={color}
@@ -216,7 +214,12 @@ export const ComplianceChart: React.FC<Props> = ({ data }) => {
         ? mx + chartConfig.lineLength + extraLineLength
         : mx - chartConfig.lineLength - extraLineLength;
 
-      const lineCenterX = (mx + ex) / 2;
+      const lineStart = isRight ? mx : ex;
+      const lineEnd = isRight ? ex : mx;
+      const percentX = isRight ? lineEnd : lineStart;
+      const percentAnchor = isRight ? 'end' : 'start';
+      const labelX = isRight ? lineEnd : lineStart;
+      const labelAnchor = isRight ? 'end' : 'start';
 
       return (
         <g>
@@ -226,22 +229,20 @@ export const ComplianceChart: React.FC<Props> = ({ data }) => {
             strokeWidth={LABEL_STROKE_WIDTH}
             fill="none"
           />
-
           <text
-            x={lineCenterX}
-            y={my - chartConfig.labelYOffset}
-            textAnchor="middle"
+            x={labelX}
+            y={my - chartConfig.lineGap - TEXT_GAP}
+            textAnchor={labelAnchor}
             fontWeight={LABEL_FONT_WEIGHT}
             fontSize={chartConfig.fontSize}
             fill={color}
           >
             {label}
           </text>
-
           <text
-            x={lineCenterX}
+            x={percentX}
             y={my - chartConfig.percentYOffset}
-            textAnchor="middle"
+            textAnchor={percentAnchor}
             fontWeight={PERCENT_FONT_WEIGHT}
             fontSize={chartConfig.fontSize}
             fill={color}
@@ -282,7 +283,6 @@ export const ComplianceChart: React.FC<Props> = ({ data }) => {
         {sortedData.map((item, index) => (
           <LegendItem key={item.name}>
             <LegendDot color={colors[index % colors.length]} />
-
             <LegendText color={theme.palette.neutral[500] ?? ''}>
               {formatFramework(item.key)}
             </LegendText>

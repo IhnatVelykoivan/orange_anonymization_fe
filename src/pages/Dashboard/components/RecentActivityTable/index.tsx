@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useTranslation } from 'react-i18next';
 
 import { DataTable } from '@/components/common/DataTable';
@@ -11,11 +9,13 @@ import { StatusBadge } from '@/features/analyses/components/StatusBadge';
 import { formatDate, formatFramework } from '@/features/analyses/utils/formatters';
 
 import type { RecentActivity } from '@/services/dashboard/types';
+import type { DashboardState } from '@/pages/Dashboard/types';
 
 import { BodyCell, CellContent } from './styled';
 
 interface RecentActivityTableProps {
   rows: RecentActivity[];
+  state: DashboardState;
 }
 
 const useColumns = (): ColumnDef<RecentActivity>[] => {
@@ -70,8 +70,17 @@ const useColumns = (): ColumnDef<RecentActivity>[] => {
   ];
 };
 
-export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({ rows }) => {
+export const RecentActivityTable = ({ rows, state }: RecentActivityTableProps) => {
   const columns = useColumns();
+  const { t } = useTranslation();
 
-  return <DataTable columns={columns} rows={rows} />;
+  return (
+    <DataTable
+      columns={columns}
+      rows={rows}
+      state={state}
+      emptyMessage={t('dashboard.recentActivity.noActivity')}
+      errorMessage={t('dashboard.recentActivity.error')}
+    />
+  );
 };

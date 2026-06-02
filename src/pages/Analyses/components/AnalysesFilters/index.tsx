@@ -1,27 +1,27 @@
 import React from 'react';
-
-import SearchIcon from '@mui/icons-material/Search';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-
-import { InputAdornment } from '@mui/material';
-import type { SelectChangeEvent } from '@mui/material';
-
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import SearchIcon from '@mui/icons-material/Search';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { InputAdornment } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
+
 import AddIcon from '@/assets/icons/dashboard/add.svg?react';
-
 import { ROUTES } from '@/constants';
-
 import { FRAMEWORK_OPTIONS } from '@/pages/Dashboard/components/DashboardFilters/constants';
 import type { FrameworkValue } from '@/pages/Dashboard/components/DashboardFilters/types';
-import { FilterMenuItem, FilterSelect } from '@/pages/Dashboard/components/DashboardFilters/styled';
-
+import { FilterMenuItem } from '@/pages/Dashboard/components/DashboardFilters/styled';
 import { NewAnalysisButton } from '@/pages/Dashboard/styled';
-
 import { DateRangeFilter } from '@/pages/Analyses/components/DateRangeFilter';
 
-import { FiltersContainer, FiltersRow, SearchInput } from './styled';
+import {
+  FiltersContainer,
+  FiltersRow,
+  SearchInput,
+  StyledFilterSelect,
+  NewAnalysisButtonWrapper,
+} from './styled';
 
 interface DateRange {
   start: Date | null;
@@ -110,7 +110,7 @@ export const AnalysesFilters: React.FC<AnalysesFiltersProps> = ({
           }}
         />
 
-        <FilterSelect
+        <StyledFilterSelect
           value={framework}
           onChange={handleFrameworkChange}
           IconComponent={KeyboardArrowDownIcon}
@@ -120,11 +120,11 @@ export const AnalysesFilters: React.FC<AnalysesFiltersProps> = ({
               {t(option.translationKey)}
             </FilterMenuItem>
           ))}
-        </FilterSelect>
+        </StyledFilterSelect>
 
         <DateRangeFilter dateRange={dateRange} setDateRange={setDateRange} />
 
-        <FilterSelect
+        <StyledFilterSelect
           value={status}
           onChange={handleStatusChange}
           IconComponent={KeyboardArrowDownIcon}
@@ -134,12 +134,14 @@ export const AnalysesFilters: React.FC<AnalysesFiltersProps> = ({
               {t(option.translationKey)}
             </FilterMenuItem>
           ))}
-        </FilterSelect>
+        </StyledFilterSelect>
       </FiltersRow>
 
-      <NewAnalysisButton startIcon={<AddIcon />} onClick={() => navigate(ROUTES.DE_IDENTIFY)}>
-        {t('dashboard.newAnalysis')}
-      </NewAnalysisButton>
+      <NewAnalysisButtonWrapper>
+        <NewAnalysisButton startIcon={<AddIcon />} onClick={() => navigate(ROUTES.DE_IDENTIFY)}>
+          {t('dashboard.newAnalysis')}
+        </NewAnalysisButton>
+      </NewAnalysisButtonWrapper>
     </FiltersContainer>
   );
 };

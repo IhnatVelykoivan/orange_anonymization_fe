@@ -10,19 +10,18 @@ interface LegendTextProps {
 
 const LEGEND_DOT_SIZE = 8;
 const CHART_MAX_WIDTH = 700;
-const CHART_HEIGHT_DEFAULT = 'clamp(260px, 45vw, 300px)';
+const CHART_HEIGHT_DEFAULT = 'clamp(260px, 45vw, 308px)';
 const CHART_HEIGHT_BREAKPOINT_899 = 320;
 const CHART_HEIGHT_SM = 260;
 const BREAKPOINT_899 = 899;
-const LEGEND_TEXT_FONT_SIZE = 'clamp(10px, 1.8vw, 12px)';
+const LEGEND_TEXT_FONT_SIZE = 'clamp(8px, 1vw, 12px)';
 
-export const ChartContainer = styled(Box)(({ theme }) => ({
+export const ChartContainer = styled(Box)(() => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   boxSizing: 'border-box',
-  gap: theme.spacing(0.5),
   overflow: 'visible',
 }));
 
@@ -50,18 +49,16 @@ export const LegendContainer = styled(Box)(({ theme }) => ({
   flexWrap: 'nowrap',
   justifyContent: 'center',
   alignItems: 'center',
-  gap: theme.spacing(0.5, 1),
-  paddingInline: theme.spacing(1),
+  gap: theme.spacing(1),
+  paddingBottom: theme.spacing(0.2),
   boxSizing: 'border-box',
-  minWidth: 0,
 }));
 
 export const LegendItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(0.5),
-  flex: 1,
-  minWidth: 0,
+  flex: '0 0 auto',
   justifyContent: 'center',
 }));
 
@@ -82,8 +79,6 @@ export const LegendText = styled(Typography, {
   ...theme.typography.labelSm,
   color,
   whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
   textAlign: 'center',
   lineHeight: theme.typography.h1.lineHeight,
   fontSize: LEGEND_TEXT_FONT_SIZE,

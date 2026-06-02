@@ -1,4 +1,4 @@
-import { startOfDay, subDays, subMonths } from 'date-fns';
+import { endOfDay, startOfDay, subDays, subMonths } from 'date-fns';
 
 import { CHART_RANGES, type Range } from '@/pages/Dashboard/components/ActivityChart/types';
 
@@ -14,13 +14,14 @@ export const getDateRange = (range: Range): DateRange => {
     case CHART_RANGES.TODAY:
       return {
         startDate: startOfDay(now),
-        endDate: now,
+        endDate: endOfDay(now),
       };
     case CHART_RANGES.YESTERDAY: {
-      const yesterday = startOfDay(subDays(now, 1));
+      const yesterday = subDays(now, 1);
+
       return {
-        startDate: yesterday,
-        endDate: yesterday,
+        startDate: startOfDay(yesterday),
+        endDate: endOfDay(yesterday),
       };
     }
     case CHART_RANGES.DAYS_14:

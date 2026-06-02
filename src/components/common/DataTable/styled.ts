@@ -28,7 +28,24 @@ export const HeadCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export const EmptyCell = styled(TableCell)(({ theme }) => ({
+  ...theme.typography.labelMd,
   borderBottom: `${BORDERS.card}px solid ${theme.palette.neutral[200]}`,
-  padding: 0,
+  color: theme.palette.neutral[500],
+  textAlign: 'center',
+  padding: theme.spacing(4, 3),
   height: theme.spacing(EMPTY_CELL_HEIGHT),
+}));
+
+export const StateWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: theme.spacing(25),
+  padding: theme.spacing(4),
+}));
+
+export const ErrorText = styled(Box)(({ theme }) => ({
+  ...theme.typography.bodyMd,
+  color: theme.palette.error.main,
+  textAlign: 'center',
 }));
