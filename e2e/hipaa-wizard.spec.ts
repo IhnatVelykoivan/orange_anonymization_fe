@@ -266,16 +266,11 @@ test.describe('HIPAA Wizard E2E', () => {
     }
   });
 
-  // BUG: ReviewAndRun.checkStatus does not call setIsProcessing(false) in the FAILED
-  // branch (and getResults catch). Because `if (isProcessing) return ...` is the first
-  // guard, the user sees "Analyzing..." forever after a job fails. This test stays
-  // here as the live reproducer and is expected to FAIL until the prod fix lands.
-  // See docs/qa-findings.md → Bug #1.
-  test('Polling — failed job status renders error state in ReviewAndRun [KNOWN BUG]', async ({
-    page,
-  }) => {
-    test.fail(true, 'Known prod bug — see docs/qa-findings.md → Bug #1');
-
+  // Regression guard for the old "endless Analyzing… spinner" bug (was
+  // docs/qa-findings.md Bug #1, fixed in develop #53): a FAILED job must leave the
+  // processing state. Current UX resolves to the results view (data-state="success")
+  // and surfaces a "failed to generate / try again" affordance rather than hanging.
+  test('Polling — failed job status leaves the processing spinner', async ({ page }) => {
     await setupAuthAndMocks(page, { forceFinalStatus: 'failed' });
     await navigateToWizard(page);
     await goToDataInput(page);
@@ -284,9 +279,9 @@ test.describe('HIPAA Wizard E2E', () => {
 
     await getNextBtn(page).click();
 
-    await expect(page.getByTestId('review-and-run')).toHaveAttribute('data-state', 'error', {
-      timeout: 15_000,
-    });
+    const reviewAndRun = page.getByTestId('review-and-run');
+    await expect(reviewAndRun).toHaveAttribute('data-state', 'success', { timeout: 15_000 });
+    await expect(reviewAndRun).not.toHaveAttribute('data-state', 'processing');
   });
 
   test('Back navigation — config (method + threshold) preserved when going back and forward', async ({

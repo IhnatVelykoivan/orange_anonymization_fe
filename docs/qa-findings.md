@@ -3,7 +3,7 @@
 > Branch: `test/final-regression-coverage` (cherry-picked the wizard E2E suite
 > onto current `develop` #48)
 > Run: `npm run build` ✓ · `npm run test:run` → 99 passed ·
-> `npm run test:e2e` → 22 passed (wizard 15 + landing 3 + contact 2 + login 2) + 1 known-fail reproducer
+> `npm run test:e2e` → 22 passed (wizard 15 + landing 3 + contact 2 + login 2)
 > Artefacts: `playwright-report/index.html` (open with `npm run test:e2e:report`)
 > Coverage: `npm run test:coverage:all` → `coverage-combined/index.html`
 
@@ -11,9 +11,10 @@ This document is the source of truth for what this regression pass _found_ — r
 prod bugs, process gaps, plus places where the Trello AC describes behaviour that
 does not exist in the current code.
 
-Bug #7 (build-breaker) is **fixed in this branch**. The De-ID wizard findings
-(#1–#6) are deferred to the next sprint by product decision; their tests are left
-as live reproducers so the team can verify a fix once it lands.
+Bug #7 (build-breaker) is **fixed in this branch**. Bug #1 (endless spinner) was
+**fixed upstream in develop #53** and merged in — its reproducer is now a normal
+passing regression guard. The remaining De-ID findings (#2–#6) are spec/UX
+discrepancies deferred to the next sprint.
 
 ---
 
@@ -87,7 +88,14 @@ public navigation to Contact / Login). No assistant test added — nothing to te
 
 ---
 
-## Bug #1 — ReviewAndRun stuck on "Analyzing…" after job failure
+## Bug #1 — ReviewAndRun stuck on "Analyzing…" after job failure ✅ FIXED (develop #53)
+
+> **Resolved in develop #53** ("fix: Fix endless spinner"), merged into this branch.
+> `checkStatus()` now calls `setIsProcessing(false)` + `setHasFailedGeneration(true)`
+> on FAILED, so the job resolves to a "failed to generate / try again" state instead
+> of hanging. The E2E reproducer was un-marked from `test.fail()` to a normal passing
+> guard (`Polling — failed job status leaves the processing spinner`). Original
+> analysis kept below for history.
 
 **Severity:** medium-high (user can never recover from a failed job without
 reload — no error UI, no retry button, just an infinite spinner).
