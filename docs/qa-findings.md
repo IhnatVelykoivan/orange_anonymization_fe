@@ -11,6 +11,10 @@ This document is the source of truth for what this regression pass _found_ — r
 prod bugs, process gaps, plus places where the Trello AC describes behaviour that
 does not exist in the current code.
 
+⚠️ **Open critical:** Bug #10 — "Generate Synthetic Data" 500s in production
+(backend crash). Not caught by the suite because unit/E2E mock the synthetic
+service/routes; see the finding for the FE follow-ups and the testing-limitation note.
+
 Bug #7 (build-breaker) is **fixed in this branch**. Bug #1 (endless spinner) was
 **fixed upstream in develop #53** and merged in — its reproducer is now a normal
 passing regression guard. The remaining De-ID findings (#2–#6) are spec/UX
@@ -85,6 +89,48 @@ implemented**". As of `develop` #48 there is no assistant/chat/widget code
 (`git grep -i 'assistant\|widget\|chat'` → nothing in `src/`). The landing page
 itself is now covered by [e2e/landing.spec.ts](../e2e/landing.spec.ts) (renders +
 public navigation to Contact / Login). No assistant test added — nothing to test yet.
+
+---
+
+### Bug #10 — [CRITICAL · OPEN · backend] "Generate Synthetic Data" returns 500 in production
+
+End-to-end the feature is **broken on the deployed environment**. `POST
+/api/synthetic-data/generate` returns **500 Internal Server Error** (observed
+2026-06-02 on FE `…-d92cbccc60f3` → BE `…-ea5bfb80acf3`, `x-powered-by: Express`).
+
+**Diagnosis.** The body is ~52 bytes — a generic NestJS unhandled-exception
+envelope (`{"statusCode":500,"message":"Internal server error"}`), i.e. the backend
+**crashes while generating**, it does not reject with a 400/422 validation error.
+The FE request is structurally valid (`raw_text`, `dataset_type:'medical_records'`,
+`num_records`, `compliance_framework`, `output_format`), so the root cause is
+**server-side** and lives in the backend repo — the FE cannot fix it.
+
+**FE-side issues found while investigating (worth a small FE PR):**
+
+- **Framework-case inconsistency.** The generator form submits
+  `compliance_framework: 'hipaa'` (lowercase `ComplianceFramework.HIPAA`,
+  [useSyntheticDataForm.ts:102](../src/components/business/syntheticData/useSyntheticDataForm.ts#L99-L104)),
+  while the "Regenerate" path submits `'HIPAA'` (uppercase,
+  [SyntheticResults/index.tsx:222](../src/pages/SyntheticResults/index.tsx#L218-L225)).
+  If the backend matches the framework enum by exact value, the lowercase form value
+  is a plausible **trigger** for the crash — flag for the BE owner to confirm.
+- **Silent failure on Regenerate.** `onRegenerate` only `console.error`s on failure
+  (no user feedback). The generator form does surface it via a Snackbar
+  ([SyntheticDataForm.tsx:234](../src/components/business/syntheticData/SyntheticDataForm.tsx#L234-L242)),
+  but the regenerate flow leaves the user with no signal.
+
+**Why the test suite did not catch this (important limitation).** Unit tests **mock**
+`syntheticService.generateSyntheticData` and the E2E specs **mock the network
+routes** — neither exercises the real backend, so a green suite says nothing about
+the live integration. The error-handling branch _is_ covered
+([useSyntheticDataForm.test.tsx](../src/test/synthetic/useSyntheticDataForm.test.tsx)
+asserts a rejected call sets `error`), which proves the FE degrades gracefully — but
+that is not the same as the feature working. **Recommendation:** add a smoke/contract
+test that hits a real (staging) `/synthetic-data/generate`, and treat this flow as a
+manual pre-demo check until the backend 500 is resolved.
+
+**Owner:** backend (500 fix). **FE follow-up:** unify framework casing + surface
+the regenerate error.
 
 ---
 
