@@ -1,6 +1,8 @@
-# Orange Anonymization Front-End
+# De-ID Studio [Frontend]
 
-Orange Anonymization is a sophisticated web platform designed for secure PII (Personally Identifiable Information) and PHI (Protected Health Information) detection and anonymization. It empowers organizations to handle sensitive data responsibly by identifying, masking, and generating synthetic alternatives to private information.
+De-ID Studio is a sophisticated web platform designed for secure PII (Personally Identifiable Information) and PHI (Protected Health Information) detection and anonymization. It empowers organizations to handle sensitive data responsibly by identifying, masking, and generating synthetic alternatives to private information.
+
+> **Note:** The backend service for this project resides at [ZenBit-Tech/orange_anonymization_be](https://github.com/ZenBit-Tech/orange_anonymization_be).
 
 ## 🚀 Features
 
@@ -66,25 +68,27 @@ Orange Anonymization is a sophisticated web platform designed for secure PII (Pe
 ```text
 src/
 ├── assets/         # Static assets (images, icons, etc.)
-├── components/     # Reusable UI components
-├── constants/      # App-wide constants and route definitions
-├── hooks/          # Custom React hooks
+├── components/     # Reusable UI components, layouts, and popups
+├── constants/      # App-wide API configs, route paths, and HTTP status
+├── features/       # Feature-specific components, hooks, and utils (domain-driven)
 ├── i18n.ts         # Internationalization setup
-├── layouts/        # Page layout wrappers (Main, Auth)
-├── pages/          # Full page components (Landing, Dashboard, etc.)
+├── pages/          # Full page components (Auth, Dashboard, DeIdentify, etc.)
 ├── routes/         # Route configuration and guards
 ├── services/       # API service layers
 ├── store/          # Redux store and slices
-├── styles/         # Global styles and theme configuration
-├── types/          # TypeScript interfaces and types
+├── test/           # Test setup, mocks, and integration tests
+├── theme.ts        # App theme configuration
 └── utils/          # Helper functions and utilities
 ```
 
 ## 📜 Available Scripts
 
 - `npm run dev`: Starts the development server with HMR.
-- `npm run build`: Compiles the application for production.
+- `npm run build`: Type-checks and compiles the application for production.
 - `npm run lint`: Runs ESLint for code quality checks.
+- `npm run format`: Formats code using Prettier.
+- `npm run test`: Runs unit and integration tests using Vitest.
+- `npm run test:ui`: Runs Vitest tests with a graphical UI.
 - `npm run preview`: Locally previews the production build.
 
 ## 📄 License
