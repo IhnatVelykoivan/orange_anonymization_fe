@@ -16,7 +16,7 @@ import StarIcon from '@mui/icons-material/Star';
 import { useSyntheticDataForm } from './useSyntheticDataForm';
 import synthetic from './styles';
 import type { SyntheticOutputFormat } from '@/services/synthetic/types';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import SyntheticWarningPopup from '@/components/popups/SyntheticWarningPopup';
 
 interface SyntheticDataFormProps {
@@ -60,14 +60,9 @@ export default function SyntheticDataForm({ sourceJobId }: SyntheticDataFormProp
     setSuccess,
   } = useSyntheticDataForm(sourceJobId);
 
-  const [, setIsWarningVisible] = useState<boolean>(!deidentifiedPreview);
+  const [isWarningDismissed, setIsWarningDismissed] = useState<boolean>(false);
 
-  const showWarning = useMemo(() => {
-    if (deidentifiedPreview === null) {
-      return true;
-    }
-    return false;
-  }, [deidentifiedPreview]);
+  const showWarning = deidentifiedPreview === null && !isWarningDismissed;
 
   return (
     <Box sx={synthetic.root}>
@@ -253,7 +248,7 @@ export default function SyntheticDataForm({ sourceJobId }: SyntheticDataFormProp
         </Alert>
       </Snackbar>
 
-      <SyntheticWarningPopup isVisible={showWarning} onClose={() => setIsWarningVisible(false)} />
+      <SyntheticWarningPopup isVisible={showWarning} onClose={() => setIsWarningDismissed(true)} />
     </Box>
   );
 }
