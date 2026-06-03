@@ -2,6 +2,9 @@
 
 De-ID Studio is a sophisticated web platform designed for secure PII (Personally Identifiable Information) and PHI (Protected Health Information) detection and anonymization. It empowers organizations to handle sensitive data responsibly by identifying, masking, and generating synthetic alternatives to private information.
 
+<img width="800" height="396" alt="ezgif-48af01a6a91b98ae" src="https://github.com/user-attachments/assets/ffe0b361-f05b-4c17-bbb5-a829a064a79b" />
+
+
 > **Note:** The backend service for this project resides at [ZenBit-Tech/orange_anonymization_be](https://github.com/ZenBit-Tech/orange_anonymization_be).
 
 ## 🚀 Features
