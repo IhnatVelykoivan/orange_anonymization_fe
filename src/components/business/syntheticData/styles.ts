@@ -1,5 +1,6 @@
 import type { Theme } from '@mui/material/styles';
 import { BORDERS } from '@/theme';
+import { GENERATE_BUTTON } from './constants';
 
 const LOCAL_RADIUS = 2;
 
@@ -202,19 +203,16 @@ export const synthetic = {
   }),
 
   generateButton: (theme: Theme) => ({
-    width: theme.spacing(31),
-    height: theme.spacing(5),
-    backgroundColor: theme.palette.primary.main,
+    width: GENERATE_BUTTON.width,
+    height: GENERATE_BUTTON.height,
+    background: GENERATE_BUTTON.backgroundColor,
     color: theme.palette.background.paper,
-    border: `2px solid ${theme.palette.primary.main}`,
+    border: `2px solid ${GENERATE_BUTTON.borderColor}`,
+    boxShadow: 'none',
     '&:hover': {
-      backgroundColor: theme.palette.primary.dark ?? theme.palette.primary.main,
-      borderColor: theme.palette.primary.dark ?? theme.palette.primary.main,
-    },
-    '&:disabled': {
-      backgroundColor: theme.palette.grey[300],
-      color: theme.palette.grey[400],
-      borderColor: theme.palette.grey[300],
+      background: theme.palette.primary.main,
+      borderColor: theme.palette.primary.main,
+      boxShadow: 'none',
     },
     ...theme.typography.button,
     lineHeight: '20px',

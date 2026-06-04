@@ -208,6 +208,7 @@ export default function SyntheticDataForm({ sourceJobId }: SyntheticDataFormProp
           <Box sx={synthetic.actionRow}>
             <Button
               variant="contained"
+              disableElevation
               disabled={!isValid || loading}
               onClick={handleSubmit}
               startIcon={<StarIcon />}
