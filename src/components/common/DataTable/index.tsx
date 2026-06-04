@@ -52,13 +52,14 @@ export const DataTable = <TRow extends { id: string | number }>({
             </TableRow>
           )}
 
-          {state === 'empty' && (
+          {(state === 'empty' || (state === 'content' && rows.length === 0)) && (
             <TableRow>
               <EmptyCell colSpan={columns.length}>{emptyMessage}</EmptyCell>
             </TableRow>
           )}
 
           {state === 'content' &&
+            rows.length > 0 &&
             rows.map((row) => (
               <TableRow key={row.id}>
                 {columns.map((col) => (

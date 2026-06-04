@@ -51,7 +51,7 @@ export const DateFilterButton = styled(Button, {
   whiteSpace: 'nowrap',
   padding: theme.spacing(0.75, 1.5),
   flex: 1,
-  minWidth: 140,
+  minWidth: 180,
 
   [theme.breakpoints.down('sm')]: {
     width: '100%',

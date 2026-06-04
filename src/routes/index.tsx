@@ -14,6 +14,7 @@ import NotFound from '@/pages/NotFound';
 import Inactivity from '@/pages/Inactivity';
 import { PageLoader } from '@/components/common/PageLoader';
 import SyntheticResults from '@/pages/SyntheticResults';
+import { ScrollToTop } from '@/components/common/ScrollToTop';
 
 const DeIdentify = lazy(() => import('@/pages/DeIdentify'));
 const SyntheticData = lazy(() => import('@/pages/SyntheticData'));
@@ -22,6 +23,8 @@ const AnalysesPage = lazy(() => import('@/pages/Analyses'));
 export function AppRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
+      <ScrollToTop />
+
       <Routes>
         <Route element={<LandingLayout />}>
           <Route path={ROUTES.CONTACT} element={<Contact />} />
